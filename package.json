@@ -1,0 +1,25 @@
+{
+  "name": "Doppelganger-Bot",
+  "version": "1.0.0",
+  "description": "Bot for discord",
+  "main": "./bot/express.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/samuelp88/Doppelganger-Bot.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/samuelp88/Doppelganger-Bot/issues"
+  },
+  "homepage": "https://github.com/samuelp88/Doppelganger-Bot#readme",
+  "dependencies": {
+    "discord.js": "^12.5.3",
+    "express": "^4.17.1",
+    "socket.io": "^4.0.1"
+  }
+}

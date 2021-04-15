@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./styles/style.css">
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="./scripts/connect.js"></script>
+</head>
+<body onload="start()">
+    <div class="discord">
+        <div class="display">
+            <div class="display-chat" id="chatbox">
+                <div class="chat-message">
+                    <img src="https://cdn.discordapp.com/avatars/832062645334573096/146d356267380966bc0b322dbe15fb6b.webp?size=2048" class="message-icon">
+                    <div class="message-body">
+                        <div class="message-header">
+                            Doppelganger
+                        </div>
+                        <div class="message-text">
+                            Bem vindo, eu
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="input-chat">
+                <input class="text-input" id="chatinput" placeholder="Conversar em ">
+            </div>
+        </div>
+        
+    </div>
+</body>
+</html>
