@@ -3,7 +3,7 @@ async function startBot() {
     const client = new Discord.Client();
 
     client.controller = {
-        channelID: '668138196705738824',
+        channelID: '799756932016767039',
     }
 
     const { token } = require('./config.json');
@@ -13,18 +13,15 @@ async function startBot() {
     });
 
     client.on('message', async message => {
-        if(message.content.startsWith('!')) {
-            const args = message.content.split(' ').splice(1)
-            client.controller.channelID = args[0];
-            return;
-        }
-
         if(message.channel.id != client.controller.channelID || message.author.id == client.user.id) return;
         const socket = client.socket;
         const msg = {
-            username: message.author.username,
+            name: message.author.username,
             content: message.content,
-            avatar: message.author.avatarURL(),
+            iconURL: message.author.avatarURL(),
+        }
+        if(message.attachments.size) {
+            msg.attachments = message.attachments.first().url;
         }
         socket.emit('message', msg)
     });
