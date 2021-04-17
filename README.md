@@ -2,7 +2,7 @@
 Interface web para controlar seu bot através do navegador como se estivesse conectado a uma conta do discord.
 
 ###### O que posso fazer?
-A principio o objetivo é que atraves da interface seja possivel fazer qualquer coisa que seu bot faria normalmente, mas atualmente essas são as possibilidades através da interface:
+A principio o objetivo é que através da interface seja possivel fazer qualquer coisa que seu bot faria normalmente, mas atualmente essas são as funcionalidades:
 - Navegue por servidores e canais de maneira facil, rapida e intuitiva.
 - Envie mensagens em quaisquer canais que seu bot tenha permissões.
 - Envie mensagens privadas para usuarios que tenham pelo menos um servidor em comum com o seu bot.
