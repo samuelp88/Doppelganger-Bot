@@ -48,39 +48,51 @@ const bot = require('./bot');
                 return
             }
             if (msg[0] == '?') {
-                const user = await client.users.fetch(msg.split(' ').splice(1)[0]);
-                const channelDM = await user.createDM();
-                client.controller.channelID = channelDM.id;
-                const messages = await channelDM.messages.fetch({ limit: 100 });
-                const messageCache = [];
-                messages.each(message => {
-                    const msgObject = {
-                        content: message.content,
-                        name: message.author.username,
-                        iconURL: message.author.avatarURL(),
-                    }
-                    if(message.attachments.size) {
-                        msgObject.attachments = message.attachments.first().attachment;
-                    }
-                    messageCache.push(msgObject);
-                });
+                try {
+                    const user = await client.users.fetch(msg.split(' ').splice(1)[0]);
+                    const channelDM = await user.createDM();
+                    client.controller.channelID = channelDM.id;
+                    const messages = await channelDM.messages.fetch({ limit: 100 });
+                    const messageCache = [];
+                    messages.each(message => {
+                        const msgObject = {
+                            name: message.author.username,
+                            content: message.content,
+                            iconURL: message.author.avatarURL(),
+                            date: message.createdAt.toLocaleString(),
+                        }
+                        if (message.attachments.size) {
+                            msgObject.attachments = message.attachments.first().attachment;
+                        }
+                        messageCache.push(msgObject);
+                    });
 
-                socket.emit('newGuild', {
-                    name: user.username,
-                    iconURL: user.avatarURL(),
-                    id: user.id,
-                    channels: channelDM,
-                });
+                    socket.emit('newGuild', {
+                        name: user.username,
+                        iconURL: user.avatarURL(),
+                        id: user.id,
+                        channels: channelDM,
+                    });
 
-                socket.emit('messagesCache', {
-                    messageCache: messageCache,
-                    name: user.username,
-                });
-                return;
+                    socket.emit('messagesCache', {
+                        messageCache: messageCache,
+                        name: user.username,
+                    });
+                    return;
+                }
+                catch {
+                    error('Não é possivel abrir uma DM para esse ID.')
+                    return;
+                }
             }
             if (!client.controller.channelID) return;
+
             const channel = await client.channels.fetch(client.controller.channelID);
-            channel.send(msg);
+            channel.send(msg).catch(e => {
+                error('Não é possivel enviar mensagens para esse usuario.')
+            });
+
+
         });
 
         socket.on('getMessages', async channelID => {
@@ -93,8 +105,9 @@ const bot = require('./bot');
                     content: message.content,
                     name: message.author.username,
                     iconURL: message.author.avatarURL(),
+                    date: message.createdAt.toLocaleString(),
                 }
-                if(message.attachments.size) {
+                if (message.attachments.size) {
                     msgObject.attachments = message.attachments.first().attachment;
                 }
                 messageCache.push(msgObject);
@@ -105,4 +118,16 @@ const bot = require('./bot');
             });
         })
     });
+
+    function error(errorMessage) {
+        const socket = client.socket;
+        const error = {
+            name: 'Erro',
+            content: errorMessage,
+            iconURL: 'https://cdn0.iconfinder.com/data/icons/social-messaging-ui-color-shapes/128/alert-circle-red-512.png',
+        }
+        socket.emit('message', error);
+    }
+
+
 })();
