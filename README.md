@@ -21,7 +21,7 @@ node v14.15.3 ou superior
 ### Como usar
 - Crie um arquivo **config.json** na pasta **/bot/**
 - Copie o código logo abaixo e cole no **config.json** e então substitua o valor de **token** pelo **token do seu bot**.
-- Depois de ter feito as etapas acima apenas execute o arquivo **run.bat** abra o navegador e acesse ***localhost:3000***
+- Depois de ter feito as etapas acima apenas execute o arquivo **run.bat**, abra o navegador e acesse ***localhost:3000***
 #### config.json
 ```json
 {
