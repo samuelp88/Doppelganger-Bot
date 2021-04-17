@@ -114,10 +114,19 @@ input:focus {
 }
 
 .message-header {
+    display: flex;
     color: tomato;
     height: 30%;
     font-weight: 1000;
     margin: 5px;
+}
+
+.message-date {
+    color: grey;
+    font-weight: 300;
+    margin-left: 5px;
+    font-size: 70%;
+    align-self: center;
 }
 
 .message-content {
@@ -137,6 +146,8 @@ input:focus {
     font-weight: bold;
     text-align: center;
     padding: 20px;
+    user-select: none;
+    cursor: pointer;
 }
 
 .channel:hover {

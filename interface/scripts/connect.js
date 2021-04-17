@@ -50,6 +50,7 @@ function start() {
             name: botUser.name,
             content: input.value,
             iconURL: botUser.iconURL,
+            date: new Date().toLocaleString(),
         }
         renderMessage(message);
     }
@@ -59,10 +60,13 @@ function start() {
         div.className = 'message';
         div.id = '';
         div.innerHTML = `
-        <img class="message-icon" src="${message.iconURL}">
+        <img class="message-icon" src="${message.iconURL || 'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/198142ac-f410-423a-bf0b-34c9cb5d9609/dbtif5j-60306864-d6b7-44b6-a9ff-65e8adcfb911.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOiIsImlzcyI6InVybjphcHA6Iiwib2JqIjpbW3sicGF0aCI6IlwvZlwvMTk4MTQyYWMtZjQxMC00MjNhLWJmMGItMzRjOWNiNWQ5NjA5XC9kYnRpZjVqLTYwMzA2ODY0LWQ2YjctNDRiNi1hOWZmLTY1ZThhZGNmYjkxMS5wbmcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6ZmlsZS5kb3dubG9hZCJdfQ.W3KM95rnj_ofajggtIrj5DA6xNti742Ho-VWcV1uYd4'}">
         <div class="message-body">
-            <div class="message-header">${message.name}</div>
-            <div class="message-content">${message.content + (message.attachments || '')}</div>
+            <div class="message-header">
+                ${message.name}
+                <div class="message-date">${message.date}</div>
+            </div>
+            <div class="message-content">${message.content + ' ' +(message.attachments || '')}</div>
         </div>
         `
         chatbox.appendChild(div)
