@@ -1,12 +1,10 @@
 const socket = io();
-const guildsManager = new Map();
 const botUser = {};
+let currentChannel = '';
+const button = {
+    active: false,
+}
 
-socket.on('ready', user => {
-    botUser.name = user.name;
-    botUser.iconURL = user.iconURL;
-    console.log('foi')
-})
 
 function start() {
     let input = document.getElementById('input');
@@ -14,7 +12,19 @@ function start() {
     let guilds = document.getElementById('guilds');
     let channelsDisplay = document.getElementById('channels');
     let chatHeader = document.getElementById('chat-header');
-    let avatarURL = '';
+    let dms = document.getElementById('dms');
+
+    socket.on('ready', user => {
+        if (botUser.ready) return;
+        botUser.name = user.name;
+        botUser.iconURL = user.iconURL;
+        botUser.guilds = user.guilds;
+        botUser.directmessages = new Map();
+        botUser.ready = true;
+
+        botUser.guilds.forEach(guild => renderGuild(guild));
+    })
+
 
     input.addEventListener('keypress', (e) => {
         if (!input.value) return;
@@ -25,21 +35,27 @@ function start() {
         }
     })
 
-    socket.on('newGuild', guild => {
-        guildsManager.set(guild.id, guild.channels);
-        renderGuild(guild);
-    })
-
     socket.on('messagesCache', cache => {
         chatbox.innerHTML = '';
-        if(cache.name) chatHeader.innerHTML = `${cache.name}`;
+        if (cache.name) chatHeader.innerHTML = `${cache.name}`;
         for (let i = cache.messageCache.length - 1; i >= 0; i--) {
             renderMessage(cache.messageCache[i])
-        }
+        };
+        removePeepoPing(currentChannel);
     })
 
     socket.on('message', msg => {
         renderMessage(msg);
+    });
+
+    socket.on('dm-message', msg => {
+        if (!botUser.directmessages.get(msg.author.id)) {
+            botUser.directmessages.set(msg.author.id, []);
+            renderDM(msg);
+        }
+        if (msg.id != currentChannel) peepoPing(msg.id);
+        const dm = botUser.directmessages.get(msg.author.id);
+        dm.push(msg);
     });
 
 
@@ -66,7 +82,7 @@ function start() {
                 ${message.name}
                 <div class="message-date">${message.date}</div>
             </div>
-            <div class="message-content">${message.content + ' ' +(message.attachments || '')}</div>
+            <div class="message-content">${message.content + ' ' + (message.attachments || '')}</div>
         </div>
         `
         chatbox.appendChild(div)
@@ -78,32 +94,90 @@ function start() {
         img.className = 'guild';
         img.src = guild.iconURL || 'https://cdn.discordapp.com/avatars/832062645334573096/146d356267380966bc0b322dbe15fb6b.png?size=1024';
         img.title = guild.name;
-        if (Array.isArray(guild.channels)) {
-            img.onclick = function () {
-                const guildChannels = guildsManager.get(guild.id);
-                channelsDisplay.innerHTML = ''; // Clear channels tab
 
-                guildChannels.forEach(channel => {
-                    if (channel.type == 'text') {
-                        const div = document.createElement('div');
-                        div.className = 'channel';
-                        div.innerHTML = channel.name;
-                        div.onclick = function () {
-                            socket.emit('getMessages', channel.id);
-                        }
-                        channelsDisplay.appendChild(div);
-                    }
-                })
-            }
-        } 
-        else {
-            channelsDisplay.innerHTML = ''; // Clear channels tab
-            img.onclick = function () {
-                channelsDisplay.innerHTML = ''; // Clear channels tab
-                chatHeader.innerHTML = guild.name;
-                socket.emit('getMessages', guild.channels.id);
-            }
+        img.onclick = function () {
+            clearChannelsTab();
+            loadChannels(guild.channels);
         }
+
+
         guilds.appendChild(img);
     }
+
+    function renderDM(dm) {
+        const div = document.createElement('div');
+        div.className = 'direct-message';
+        div.title = dm.name;
+        div.innerHTML =
+            `<img class="dm-image" src="${dm.iconURL}">
+         <div class="" id="${dm.id}"></div>`;
+        div.onclick = function () {
+            currentChannel = dm.id;
+            socket.emit('getMessages', dm.id);
+            clearChannelsTab();
+
+            socket.once('messagesCache', cache => {
+                chatHeader.innerHTML = dm.name;
+            })
+        }
+        dms.appendChild(div);
+    }
+
+    function peepoPing(dmID) {
+        const dm = document.getElementById(dmID)
+        dm.className = "peepoping";
+    }
+
+    function removePeepoPing(dmID) {
+        const dm = document.getElementById(dmID)
+        if (dm) dm.className = "";
+    }
+
+    //Channel related functions
+    function clearChannelsTab() {
+        channelsDisplay.innerHTML = ''; // Clear channels tab
+    }
+
+    function loadChannels(channels) {
+        channels.forEach(channel => {
+            const div = document.createElement('div');
+            div.className = 'channel';
+            div.innerHTML = channel.name;
+            div.onclick = function () {
+                currentChannel = channel.id;
+                socket.emit('getMessages', channel.id); // Maybe i need to change this later
+            }
+            channelsDisplay.appendChild(div);
+        })
+    }
+
 }
+
+function toggleDMButton() {
+    const dmbutton = document.getElementById('dm-button');
+    if (!button.active) {
+        dmbutton.innerHTML = '<input type="text" class="dm-input" id="dm-input">';
+        const input = document.getElementById('dm-input');
+        input.focus();
+        button.active = true;
+
+        input.addEventListener('keypress', (e) => {
+            if (!input.value) return
+
+            if (e.key === 'Enter') {
+                newDM(input.value);
+                toggleDMButton();
+            }
+        });
+    }
+    else {
+        dmbutton.innerHTML = '';
+        button.active = false;
+    }
+}
+
+function newDM(userID) {
+    socket.emit('newDM', userID);
+}
+
+

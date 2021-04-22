@@ -13,8 +13,20 @@ async function startBot() {
     });
 
     client.on('message', async message => {
-        if(message.channel.id != client.controller.channelID || message.author.id == client.user.id) return;
         const socket = client.socket;
+        if(message.channel.type == "dm") {
+            if(message.author.id == client.user.id) return;
+            const msg = {
+                id: message.channel.id,
+                name: message.author.username,
+                author: message.author,
+                content: message.content,
+                iconURL: message.author.avatarURL(),
+                date: message.createdAt.toLocaleString(),
+            }
+            socket.emit('dm-message', msg);
+        }
+        if(message.channel.id != client.controller.channelID || message.author.id == client.user.id) return;
         if(!client.socket) return;
         const msg = {
             name: message.author.username,

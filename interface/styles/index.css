@@ -154,6 +154,73 @@ input:focus {
     background-color: #323538;
 }
 
+.dm-button {
+    height: 50px;
+    width: 50px;
+    margin: 15px;
+    border-radius: 50%;
+    background-color: rgb(46, 45, 42);
+}
+
+.dm-input {
+    width: 150px;
+    height: 50px;
+    margin-top: 0px;
+    margin-left: -100px;
+    position: absolute;
+    text-align: center;
+    text-justify: center;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-radius: 25px;
+    color: #DCDDDE;
+    border: 1px solid rgb(36, 34, 34);
+}
+
+.dm-input:focus {
+    outline: none;
+    color: #DCDDDE;
+}
+
+.dms {
+    display: flex;
+    flex-direction: column;
+    min-width: 7%;
+    border-radius: 0px 10px 10px 0px;
+    overflow: auto;
+    background-color: #1e2124;
+    border: 1px solid #282b30;
+    align-items: center;
+}
+
+.direct-message {
+    display: flex;
+    border-radius: 50%;
+    height: 50px;
+    width: 50px;
+    margin: 15px;
+    align-content: center;
+    justify-content: center;
+}
+
+.peepoping {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    margin-top: 30px;
+    margin-left: 30px;
+    border: 5px solid #1e2124;
+    background-color: red;
+    position: absolute;
+    text-align: center;
+    text-justify: center;
+}
+
+.dm-image {
+    max-height: 100%;
+    border-radius: 50%;
+}
+
 .guild {
     border-radius: 50%;
     margin: 15px;

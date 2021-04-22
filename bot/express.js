@@ -12,7 +12,6 @@ const bot = require('./bot');
 (async () => {
 
     const client = await bot();
-    const guilds = client.guilds.cache;
 
     app.use(express.static(path.join(__dirname, '../interface')));
 
@@ -25,28 +24,70 @@ const bot = require('./bot');
     })
 
     io.on('connection', socket => {
+        const guilds = [];
         client.socket = socket;
-        console.log('Interface conectada')
+        console.log('Interface conectada');
+
+        client.guilds.cache.forEach(g => {
+            const guild = {
+                id: g.id,
+                name: g.name,
+                iconURL: g.iconURL(),
+                channels: g.channels.cache.map(channel => {
+                    return {
+                        id: channel.id,
+                        type: channel.type,
+                        name: channel.name
+                    }
+                }),
+            };
+            guilds.push(guild);
+        });
+
         socket.emit('ready', {
             name: client.user.username,
             iconURL: client.user.avatarURL(),
+            guilds: guilds,
         })
 
-        guilds.forEach(guild => {
-            const channels = guild.channels.cache;
-            socket.emit('newGuild', {
-                name: guild.name,
-                iconURL: guild.iconURL(),
-                id: guild.id,
-                channels: channels,
-            })
+        socket.on('newDM', async id => {
+            const user = await client.users.fetch(id);
+            const channelDM = await user.createDM();
+            client.controller.channelID = channelDM.id;
+            const messages = await channelDM.messages.fetch({ limit: 100 });
+            const messageCache = [];
+            messages.each(message => {
+                const msgObject = {
+                    name: message.author.username,
+                    content: message.content,
+                    iconURL: message.author.avatarURL(),
+                    date: message.createdAt.toLocaleString(),
+                }
+                if (message.attachments.size) {
+                    msgObject.attachments = message.attachments.first().attachment;
+                }
+                messageCache.push(msgObject);
+            });
+
+            const msg = {
+                id: channelDM.id,
+                name: user.username,
+                author: user,
+                content: '',
+                iconURL: user.avatarURL(),
+                test: false,
+            }
+            socket.emit('dm-message', msg);
+
+            socket.emit('messagesCache', {
+                messageCache: messageCache,
+                name: user.username,
+            });
+
+            return;
         })
 
         socket.on('message', async msg => {
-            if (msg[0] == '!') {
-                client.controller.channelID = msg.split(' ').splice(1)[0];
-                return
-            }
             if (msg[0] == '?') {
                 try {
                     const user = await client.users.fetch(msg.split(' ').splice(1)[0]);
@@ -67,12 +108,7 @@ const bot = require('./bot');
                         messageCache.push(msgObject);
                     });
 
-                    socket.emit('newGuild', {
-                        name: user.username,
-                        iconURL: user.avatarURL(),
-                        id: user.id,
-                        channels: channelDM,
-                    });
+    
 
                     socket.emit('messagesCache', {
                         messageCache: messageCache,
