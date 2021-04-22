@@ -8,6 +8,8 @@ A principio o objetivo é que através da interface seja possivel fazer qualquer
 - Envie mensagens privadas para usuarios que tenham pelo menos um servidor em comum com o seu bot.
 - Novas funcionalidades serão adicionadas ao longo do tempo.
 
+![](doppelgangerdemo.gif)
+
 ## Começando
 ### Instalação
 ```
